@@ -4,6 +4,13 @@ document.addEventListener("DOMContentLoaded", async function () {
   const resultMessage = document.getElementById("resultMessage");
   const openTabsCounter = document.getElementById("openTabsCounter");
 
+  // Add a keydown event listener to the titleInput
+  titleInput.addEventListener("keydown", function (event) {
+    if (event.key === "Enter") {
+      closeTabsButton.click(); // Programmatically trigger a click on the closeTabsButton
+    }
+  });
+
   closeTabsButton.addEventListener("click", async () => {
     const inputText = titleInput.value.trim(); // Remove leading and trailing whitespace
     if (inputText === "") {
@@ -13,13 +20,35 @@ document.addEventListener("DOMContentLoaded", async function () {
       return; // Exit the function if input is empty
     }
 
+    // Define a regular expression of disallowed input values for "code crashing"
+    let disallowedInputs__codeCrashing = /^(((\[|\*|\?|\+)+)|(\\|\\\\\\|\\\\\\\\\\))$/; // TODO: Add support to \, \\\, \\\\\, etc... I currently only added support for 3 repetitions max. Above 3 will lead to the unexpected behavior.
+
+    // Check if the inputText contains disallowed input values, which would results in a code crashing
+    if (disallowedInputs__codeCrashing.test(inputText)) {
+      resultMessage.textContent = "Please enter a valid title regular expression and try again.";
+      resultMessage.style.color = "red"; // Set text color to red
+      closeTabsButton.style.backgroundColor = "red"; // Set button color to red
+      return; // Exit the function if input is invalid
+    }
+
+    // Define a regular expression of disallowed input values for "close all tabs"
+    let disallowedInputs__closeAllTabs = /^(((\||\.|\^|\$|\(\))+)|(\/))$/;
+
+    // Check if the inputText contains disallowed input values, which would results in closing all tabs
+    if (disallowedInputs__closeAllTabs.test(inputText)) {
+      resultMessage.innerHTML  = `The regular expression you entered would be closing all opened tabs.<br><br>Perhaps, if you really want that, use the following regular expression: <span style="color: blue;">^.*$</span>`;
+      resultMessage.style.color = "red"; // Set text color to red
+      closeTabsButton.style.backgroundColor = "red"; // Set button color to red
+      return; // Exit the function if input is invalid
+    }
+
     closeTabsButton.disabled = true; // Disable the button while processing
     closeTabsButton.style.backgroundColor = "blue"; // Set button color to blue
     resultMessage.textContent = "Loading..."; // Show loading message
     resultMessage.style.color = "white"; // Reset text color to white
 
     const regex = new RegExp(inputText, "i"); // Case-insensitive regex
-    let tabsClosedCount = 0;
+    let tabsClosedCount = 0; // Initialize a counter to keep track of the number of tabs that have been closed
     let totalTabsToClose = 0; // Count of tabs that match the search criteria
     let closedTabsInfo = []; // Array to store closed tabs' info
 
