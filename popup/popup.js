@@ -4,6 +4,9 @@ document.addEventListener("DOMContentLoaded", async function () {
   const resultMessage = document.getElementById("resultMessage");
   const openTabsCounter = document.getElementById("openTabsCounter");
 
+  // Automatically focus on the title input field when the extension icon is clicked
+  titleInput.focus();
+
   // Add a keydown event listener to the titleInput
   titleInput.addEventListener("keydown", function (event) {
     if (event.key === "Enter") {
@@ -11,6 +14,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
   });
 
+  // Add a click event listener to the titleInput
   closeTabsButton.addEventListener("click", async () => {
     const inputText = titleInput.value.trim(); // Remove leading and trailing whitespace
     if (inputText === "") {
