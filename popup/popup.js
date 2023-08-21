@@ -7,12 +7,16 @@ document.addEventListener("DOMContentLoaded", async function () {
   closeTabsButton.addEventListener("click", async () => {
     const inputText = titleInput.value.trim(); // Remove leading and trailing whitespace
     if (inputText === "") {
+      resultMessage.textContent = "Please enter a title regular expression and try again.";
+      resultMessage.style.color = "red"; // Set text color to red
+      closeTabsButton.style.backgroundColor = "red"; // Set button color to red
       return; // Exit the function if input is empty
     }
 
     closeTabsButton.disabled = true; // Disable the button while processing
     closeTabsButton.style.backgroundColor = "blue"; // Set button color to blue
     resultMessage.textContent = "Loading..."; // Show loading message
+    resultMessage.style.color = "white"; // Reset text color to white
 
     const regex = new RegExp(inputText, "i"); // Case-insensitive regex
     let tabsClosedCount = 0;
@@ -31,7 +35,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     // Update result message to show the total count of tabs to close
-    resultMessage.textContent = `Closing ${totalTabsToClose} tabs...`;
+    resultMessage.textContent = `Closing ${tabsClosedCount} of ${totalTabsToClose} tabs...`;
 
     for (const tab of tabs) {
       if (regex.test(tab.title)) {
@@ -54,13 +58,15 @@ document.addEventListener("DOMContentLoaded", async function () {
     let buttonColor = "";
 
     if (tabsClosedCount > 0) {
-      message = `${tabsClosedCount} ${tabsClosedCount === 1 ? "tab" : "tabs"} with matching title closed.`;
+      message = `${tabsClosedCount} ${tabsClosedCount === 1 ? "tab" : "tabs"} with a matching title have been closed out of ${totalTabsCount} ${totalTabsCount === 1 ? "tab" : "tabs"}.`;
       buttonColor = "green";
     } else if (updatedTabs.length === 0) {
       message = "No open tabs to close.";
+      resultMessage.style.color = "red"; // Set text color to red
       buttonColor = "red";
     } else {
       message = "No tabs with matching title found.";
+      resultMessage.style.color = "red"; // Set text color to red
       buttonColor = "red";
     }
 
@@ -73,7 +79,15 @@ document.addEventListener("DOMContentLoaded", async function () {
     closeTabsButton.disabled = false; // Re-enable the button
   });
 
+  // Function to update the open tabs counter in real time
+  async function updateOpenTabsCounter() {
+    const tabs = await browser.tabs.query({});
+    openTabsCounter.textContent = tabs.length;
+  }
+
   // Initial update of open tabs counter
-  const initialTabs = await browser.tabs.query({});
-  openTabsCounter.textContent = initialTabs.length;
+  updateOpenTabsCounter();
+
+  // Set up a timer to periodically update the open tabs counter
+  setInterval(updateOpenTabsCounter, 100);
 });
