@@ -37,7 +37,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     // Define a regular expression of disallowed input values for "close all tabs"
-    let disallowedInputs__closeAllTabs = /^(((\||\.|\^|\$|\(\))+)|(\/))$/;
+    let disallowedInputs__closeAllTabs = /^(((\||\.|\^|\$)+)|(\/))$/;
 
     // Check if the inputText contains disallowed input values, which would results in closing all tabs
     if (disallowedInputs__closeAllTabs.test(inputText)) {
