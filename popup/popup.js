@@ -70,7 +70,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     // Prompt the user in case he was going to close all opened tabs
     if (totalTabsCount === totalTabsToClose) {
-      if (!confirm("You are about to close all tabs. Are you sure you want to proceed?")) {
+      if (!confirm("You are about to close all open tabs, which will result in exiting your browser.\n\nAre you sure you want to proceed?")) {
         closeTabsButton.disabled = false; // Disable the button while processing
         resultMessage.textContent = ""; // Delete the loading message
         return; // Exit the function if user don't want to close all tabs
