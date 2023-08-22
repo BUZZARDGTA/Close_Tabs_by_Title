@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     // Define a regular expression of disallowed input values for "code crashing"
-    let disallowedInputs__codeCrashing = /^(((\[|\*|\?|\+)+)|(\\|\\\\\\|\\\\\\\\\\))$/; // TODO: Add support to \, \\\, \\\\\, etc... I currently only added support for 3 repetitions max. Above 3 will lead to the unexpected behavior.
+    let disallowedInputs__codeCrashing = /^(((\[|\*|\?|\+)+)|\\(?:\\\\)*(?!\\))$/;
 
     // Check if the inputText contains disallowed input values, which would results in a code crashing
     if (disallowedInputs__codeCrashing.test(inputText)) {
