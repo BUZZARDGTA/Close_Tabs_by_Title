@@ -17,6 +17,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   // Add a click event listener to the titleInput
   closeTabsButton.addEventListener("click", async () => {
     const inputText = titleInput.value.trim(); // Remove leading and trailing whitespace
+
     if (inputText === "") {
       resultMessage.textContent = "Please enter a title regular expression and try again.";
       resultMessage.style.color = "red"; // Set text color to red
@@ -25,7 +26,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     // Define a regular expression of disallowed input values for "code crashing"
-    let disallowedInputs__codeCrashing = /^(((\[|\*|\?|\+)+)|\\(?:\\\\)*(?!\\))$/;
+    let disallowedInputs__codeCrashing = /^(((\[|\*|\?|\(|\)|\+)+)|(\\(?:\\\\)*(?!\\)))$/;
 
     // Check if the inputText contains disallowed input values, which would results in a code crashing
     if (disallowedInputs__codeCrashing.test(inputText)) {
