@@ -82,6 +82,10 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     for (const tab of tabs) {
       if (regex.test(tab.title)) {
+        const tabs = await browser.tabs.query({});
+        if (tabs.length === 1) {
+          await browser.tabs.create({}); // Create a new tab if the user closes all tabs to prevent the web browser from exiting
+        }
         await browser.tabs.remove(tab.id);
         tabsClosedCount++;
 
@@ -124,8 +128,8 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   // Function to update the open tabs counter in real time
   async function updateOpenTabsCounter() {
-    const tabs = await browser.tabs.query({});
-    openTabsCounter.textContent = tabs.length;
+    const async_tabs = await browser.tabs.query({});
+    openTabsCounter.textContent = async_tabs.length;
   }
 
   // Initial update of open tabs counter
