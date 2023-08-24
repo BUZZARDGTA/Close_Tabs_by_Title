@@ -4,13 +4,12 @@ document.addEventListener("DOMContentLoaded", async function () {
   const resultMessage = document.getElementById("resultMessage");
   const openTabsCounter = document.getElementById("openTabsCounter");
 
-  // Automatically focus on the title input field when the extension icon is clicked
-  titleInput.focus();
+  titleInput.focus(); // Automatically focus on the title input field when the extension icon is clicked
 
-  // Add a keydown event listener to the titleInput
+  // Add a keydown event listener to the titleInput and programmatically trigger a click on the closeTabsButton
   titleInput.addEventListener("keydown", function (event) {
     if (event.key === "Enter") {
-      closeTabsButton.click(); // Programmatically trigger a click on the closeTabsButton
+      closeTabsButton.click();
     }
   });
 
@@ -20,27 +19,28 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     if (inputText === "") {
       resultMessage.textContent = "Please enter a title regular expression and try again.";
-      resultMessage.style.color = "red"; // Set text color to red
-      closeTabsButton.style.backgroundColor = "red"; // Set button color to red
-      return; // Exit the function if input is empty
+      resultMessage.style.color = "red";
+      closeTabsButton.style.backgroundColor = "red";
+      return;
     }
 
-    closeTabsButton.disabled = true; // Disable the button while processing
-    closeTabsButton.style.backgroundColor = "blue"; // Set button color to blue
-    resultMessage.textContent = "Loading..."; // Show loading message
-    resultMessage.style.color = "white"; // Reset text color to white
+    closeTabsButton.disabled = true;
+    closeTabsButton.style.backgroundColor = "blue";
+    resultMessage.textContent = "Loading...";
+    resultMessage.style.color = "white";
 
     let regex; // Declare the regex variable outside the try block
 
+    // Catch invalid regular expression errors
     try {
       regex = new RegExp(inputText, "i"); // Case-insensitive regex
-    } catch (error) { // Catch invalid regular expression errors
+    } catch (error) {
         if (error instanceof SyntaxError) {
           resultMessage.textContent = "Please enter a valid regular expression and try again.";
-          resultMessage.style.color = "red"; // Set text color to red
-          closeTabsButton.style.backgroundColor = "red"; // Set button color to red
-          closeTabsButton.disabled = false; // Enable the button back
-          return; // Exit the function if regular expression is invalid
+          resultMessage.style.color = "red";
+          closeTabsButton.style.backgroundColor = "red";
+          closeTabsButton.disabled = false;
+          return;
         }
     }
 
@@ -65,14 +65,13 @@ document.addEventListener("DOMContentLoaded", async function () {
     // Prompt the user in case he was going to close all opened tabs
     if (totalTabsCount === totalTabsToClose) {
       if (!confirm("You are about to close all open tabs, which will result in exiting your browser.\n\nAre you sure you want to proceed?")) {
-        closeTabsButton.disabled = false; // Enable the button back
-        resultMessage.textContent = ""; // Delete the loading message
-        return; // Exit the function if user don't want to close all tabs
+        closeTabsButton.disabled = false;
+        resultMessage.textContent = "";
+        return;
       }
     }
 
-    // Update result message to show the total count of tabs to close
-    resultMessage.textContent = `Closing ${tabsClosedCount} of ${totalTabsToClose} tabs...`;
+    resultMessage.textContent = `Closing ${tabsClosedCount} of ${totalTabsToClose} tabs...`; // Update result message to show the total count of tabs to close
 
     for (const tab of tabsToClose) {
       const tabs = await browser.tabs.query({}); // Query the updated list of tabs
@@ -82,11 +81,9 @@ document.addEventListener("DOMContentLoaded", async function () {
       await browser.tabs.remove(tab.id); // Remove the opened tab matching the titles regular expression
       tabsClosedCount++;
 
-      // Store closed tabs' info
-      closedTabsInfo.push({ url: tab.url, title: tab.title });
+      closedTabsInfo.push({ url: tab.url, title: tab.title }); // Store closed tabs' info
 
-      // Display progress in the loading message
-      resultMessage.textContent = `Closing ${tabsClosedCount} of ${totalTabsToClose} tabs...`;
+      resultMessage.textContent = `Closing ${tabsClosedCount} of ${totalTabsToClose} tabs...`; // Display progress in the loading message
     }
 
     // Update the open tabs counter after closing tabs
@@ -101,21 +98,20 @@ document.addEventListener("DOMContentLoaded", async function () {
       buttonColor = "green";
     } else if (updatedTabs.length === 0) {
       message = "No open tabs to close.";
-      resultMessage.style.color = "red"; // Set text color to red
+      resultMessage.style.color = "red";
       buttonColor = "red";
     } else {
       message = "No tabs with matching title found.";
-      resultMessage.style.color = "red"; // Set text color to red
+      resultMessage.style.color = "red";
       buttonColor = "red";
     }
 
-    // Log closed tabs' info to the console
-    console.log("Closed tabs:", closedTabsInfo);
+    console.log("Closed tabs:", closedTabsInfo); // Log closed tabs' info to the console
 
     // Display the result message and set button color
     resultMessage.textContent = message;
     closeTabsButton.style.backgroundColor = buttonColor;
-    closeTabsButton.disabled = false; // Re-enable the button
+    closeTabsButton.disabled = false;
   });
 
   // Function to update the open tabs counter in real time
@@ -124,9 +120,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     openTabsCounter.textContent = async_tabs.length;
   }
 
-  // Initial update of open tabs counter
-  updateOpenTabsCounter();
+  updateOpenTabsCounter(); // Initial update of open tabs counter
 
-  // Set up a timer to periodically update the open tabs counter
-  setInterval(updateOpenTabsCounter, 100);
+  setInterval(updateOpenTabsCounter, 100); // Set up a timer to periodically update the open tabs counter
 });
