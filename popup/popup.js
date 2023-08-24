@@ -19,14 +19,18 @@ document.addEventListener("DOMContentLoaded", async function () {
 });
 
   // Add a keydown event listener to the titleInput and programmatically trigger a click on the closeTabsButton
-  titleInput.addEventListener("keydown", function (event) {
+  titleInput.addEventListener("keydown", async function (event) {
     if (event.key === "Enter") {
-      closeTabsButton.click();
+      await handleAsyncAction();
     }
   });
 
   // Add a click event listener to the titleInput
   closeTabsButton.addEventListener("click", async () => {
+    await handleAsyncAction();
+  });
+
+  async function handleAsyncAction() {
     const inputText = titleInput.value.trim(); // Remove leading and trailing whitespace
 
     if (inputText === "") {
@@ -71,8 +75,9 @@ document.addEventListener("DOMContentLoaded", async function () {
       resultMessage.textContent = "No open tabs matching this regular expression found.";
       resultMessage.style.color = "red";
       closeTabsButton.style.backgroundColor = "red";
+      closeTabsButton.disabled = false;
       return;
-}
+    }
 
     // Prompt the user in case he was going to close all opened tabs
     if (totalTabsCount === totalTabsToClose) {
@@ -124,7 +129,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     resultMessage.textContent = message;
     closeTabsButton.style.backgroundColor = buttonColor;
     closeTabsButton.disabled = false;
-  });
+  };
 
   // Function to update the open tabs counter in real time
   async function updateOpenTabsCounter() {
