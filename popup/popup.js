@@ -54,6 +54,14 @@ document.addEventListener("DOMContentLoaded", async function () {
     const tabsToClose = tabs.filter(tab => regex.test(tab.title));
     const totalTabsToClose = tabsToClose.length;
 
+    // Check if there are tabs to close matching the regular expression
+    if (totalTabsToClose <= 0) {
+      resultMessage.textContent = "No open tabs matching this regular expression found.";
+      resultMessage.style.color = "red";
+      closeTabsButton.style.backgroundColor = "red";
+      return;
+}
+
     // Prompt the user in case he was going to close all opened tabs
     if (totalTabsCount === totalTabsToClose) {
       if (!confirm("You are about to close all open tabs, which will result in exiting your browser.\n\nAre you sure you want to proceed?")) {
