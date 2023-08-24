@@ -16,12 +16,6 @@
       font-size: 24px;
     }
 
-    input {
-      width: 95%;
-      padding: 8px;
-      margin-bottom: 10px;
-    }
-
     button {
       background-color: #007bff;
       color: #fff;
@@ -43,12 +37,33 @@
     #openTabsCounter {
       font-weight: bold;
     }
+
+    .input-container {
+      width: 95%;
+      overflow: hidden; /* Hide the overflow */
+    }
+
+    #titleInput {
+      width: 100%;
+      padding: 8px;
+      box-sizing: border-box; /* Include padding and border in the element's total width */
+      resize: none; /* Disable textarea resizing */
+      overflow-y: hidden; /* Hide the vertical scrollbar by default */
+      border: 1px solid #ccc;
+      height: 2.5em; /* Set a single line height */
+    }
+
+    #closeTabsButton {
+      margin-top: 10px; /* Add margin to separate the button from the textarea */
+    }
   </style>
 </head>
 
 <body>
   <h1>Close Tabs by Title</h1>
-  <input type="text" id="titleInput" placeholder="Title Regular Expression">
+  <div class="input-container">
+    <textarea id="titleInput" placeholder="Title Regular Expression"></textarea>
+  </div>
   <button id="closeTabsButton">Close Tabs</button>
   <div id="loadingIndicator" style="display: none;">Loading...</div> <!-- Loading indicator -->
   <p id="resultMessage"></p> <!-- Display result message here -->

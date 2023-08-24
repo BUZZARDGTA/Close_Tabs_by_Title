@@ -6,6 +6,18 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   titleInput.focus(); // Automatically focus on the title input field when the extension icon is clicked
 
+  // Adjust textarea height to match content, but no larger than a single line
+  const defaultSingleLineHeight = getComputedStyle(titleInput).height;
+
+  titleInput.addEventListener("input", function () {
+    if (this.value.trim() === "") {
+      this.style.height = defaultSingleLineHeight; // Reset back to default single line height the textarea when content is deleted
+    } else {
+      this.style.height = defaultSingleLineHeight; // Set a fixed height for a single line
+      this.style.height = (this.scrollHeight > parseFloat(getComputedStyle(this).fontSize) * 2.5 ? this.scrollHeight : parseFloat(getComputedStyle(this).fontSize) * 2.5) + "px";
+    }
+});
+
   // Add a keydown event listener to the titleInput and programmatically trigger a click on the closeTabsButton
   titleInput.addEventListener("keydown", function (event) {
     if (event.key === "Enter") {
