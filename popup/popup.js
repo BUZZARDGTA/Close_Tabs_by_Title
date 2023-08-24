@@ -39,29 +39,25 @@ document.addEventListener("DOMContentLoaded", async function () {
           resultMessage.textContent = "Please enter a valid regular expression and try again.";
           resultMessage.style.color = "red"; // Set text color to red
           closeTabsButton.style.backgroundColor = "red"; // Set button color to red
-          return; // Exit the function if input is invalid
+          closeTabsButton.disabled = false; // Enable the button back
+          return; // Exit the function if regular expression is invalid
         }
     }
 
     let tabsClosedCount = 0; // Initialize a counter to keep track of the number of tabs that have been closed
-    let totalTabsToClose = 0; // Count of tabs that match the search criteria
     let closedTabsInfo = []; // Array to store closed tabs' info
 
-    // Query the updated list of tabs every time the button is clicked
-    const tabs = await browser.tabs.query({});
-    const totalTabsCount = tabs.length;
+    const tabs = await browser.tabs.query({}); // Query the updated list of tabs every time the button is clicked
+    const totalTabsCount = tabs.length; // Count of tabs that match the search criteria
 
     // Calculate the total count of tabs to close
-    for (const tab of tabs) {
-      if (regex.test(tab.title)) {
-        totalTabsToClose++;
-      }
-    }
+    const tabsToClose = tabs.filter(tab => regex.test(tab.title));
+    const totalTabsToClose = tabsToClose.length;
 
     // Prompt the user in case he was going to close all opened tabs
     if (totalTabsCount === totalTabsToClose) {
       if (!confirm("You are about to close all open tabs, which will result in exiting your browser.\n\nAre you sure you want to proceed?")) {
-        closeTabsButton.disabled = false; // Disable the button while processing
+        closeTabsButton.disabled = false; // Enable the button back
         resultMessage.textContent = ""; // Delete the loading message
         return; // Exit the function if user don't want to close all tabs
       }
@@ -70,21 +66,19 @@ document.addEventListener("DOMContentLoaded", async function () {
     // Update result message to show the total count of tabs to close
     resultMessage.textContent = `Closing ${tabsClosedCount} of ${totalTabsToClose} tabs...`;
 
-    for (const tab of tabs) {
-      if (regex.test(tab.title)) {
-        const tabs = await browser.tabs.query({});
-        if (tabs.length === 1) {
-          await browser.tabs.create({}); // Create a new tab if the user closes all tabs to prevent the web browser from exiting
-        }
-        await browser.tabs.remove(tab.id);
-        tabsClosedCount++;
-
-        // Store closed tabs' info
-        closedTabsInfo.push({ url: tab.url, title: tab.title });
-
-        // Display progress in the loading message
-        resultMessage.textContent = `Closing ${tabsClosedCount} of ${totalTabsToClose} tabs...`;
+    for (const tab of tabsToClose) {
+      const tabs = await browser.tabs.query({});
+      if (tabs.length === 1) {
+        await browser.tabs.create({}); // Create a new tab if the user closes all tabs to prevent the web browser from exiting
       }
+      await browser.tabs.remove(tab.id); // Remove the opened tab matching the titles regular expression
+      tabsClosedCount++;
+
+      // Store closed tabs' info
+      closedTabsInfo.push({ url: tab.url, title: tab.title });
+
+      // Display progress in the loading message
+      resultMessage.textContent = `Closing ${tabsClosedCount} of ${totalTabsToClose} tabs...`;
     }
 
     // Update the open tabs counter after closing tabs
