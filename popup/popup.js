@@ -67,7 +67,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     resultMessage.textContent = `Closing ${tabsClosedCount} of ${totalTabsToClose} tabs...`;
 
     for (const tab of tabsToClose) {
-      const tabs = await browser.tabs.query({});
+      const tabs = await browser.tabs.query({}); // Query the updated list of tabs
       if (tabs.length === 1) {
         await browser.tabs.create({}); // Create a new tab if the user closes all tabs to prevent the web browser from exiting
       }
