@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   titleInput.focus(); // Automatically focus on the title input field when the extension icon is clicked
 
-  // Adjust title ipnut text area height to match content, but no larger than a single line
+  // Adjust title input text area height to match content, but no larger than a single line
   titleInput.addEventListener("input", function () {
     if (this.value.trim() === "") {
       this.style.height = defaultSingleLineHeight; // Reset back to default single line height the textarea when content is deleted
@@ -60,7 +60,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       resultMessage.style.color = "red";
       closeTabsButton.style.backgroundColor = "red";
       closeTabsButton.disabled = false;
-      titleInput.focus()
+      titleInput.focus();
       return;
     }
 
@@ -75,7 +75,7 @@ document.addEventListener("DOMContentLoaded", async function () {
           resultMessage.style.color = "red";
           closeTabsButton.style.backgroundColor = "red";
           closeTabsButton.disabled = false;
-          titleInput.focus()
+          titleInput.focus();
           return;
         }
     }
@@ -92,7 +92,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       resultMessage.style.color = "red";
       closeTabsButton.style.backgroundColor = "red";
       closeTabsButton.disabled = false;
-      titleInput.focus()
+      titleInput.focus();
       return;
     }
 
@@ -102,7 +102,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         resultMessage.textContent = "";
         closeTabsButton.style.backgroundColor = defaultcloseTabsButtonBackgroundColor;
         closeTabsButton.disabled = false;
-        titleInput.focus()
+        titleInput.focus();
         return;
       }
     }
@@ -146,7 +146,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     resultMessage.textContent = message;
     closeTabsButton.style.backgroundColor = buttonColor;
     closeTabsButton.disabled = false;
-    titleInput.focus() // TODO: THIS WILL NOT BE WORKING IF THE CURRENT TAB GOT CLOSED, that probably means the "popup.html" lost it's focus in the first place.
+    titleInput.focus(); // TODO: THIS WILL NOT BE WORKING IF THE CURRENT TAB GOT CLOSED, that probably means the "popup.html" lost it's focus in the first place.
   };
 
   async function delay(milliseconds) {
