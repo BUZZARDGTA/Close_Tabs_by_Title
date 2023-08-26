@@ -11,8 +11,7 @@
     }
   },
   "permissions": [
-    "tabs",
-    "activeTab"
+    "tabs"
   ],
   "host_permissions": [
     "http://*/*",
