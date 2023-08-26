@@ -117,7 +117,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     for (const tab of tabsToClose) {
       const tabs = await browser.tabs.query({}); // Query the updated list of tabs
       if (tabs.length === 1) {
-        await browser.tabs.create({}); // Create a new tab if the user closes all tabs to prevent the web browser from exiting
+        await browser.tabs.create({ active: false }); // Create a new tab if the user closes all tabs to prevent the web browser from exiting
       }
       await browser.tabs.remove(tab.id); // Remove the opened tab matching the titles regular expression
       tabsClosedCount++;
@@ -146,7 +146,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     resultMessage.textContent = message;
     closeTabsButton.style.backgroundColor = buttonColor;
     closeTabsButton.disabled = false;
-    titleInput.focus() // TODO: NOT WORKING FOR SOME REASONS?
+    titleInput.focus() // TODO: THIS WILL NOT BE WORKING IF THE CURRENT TAB GOT CLOSED, that probably means the "popup.html" lost it's focus in the first place.
   };
 
   async function delay(milliseconds) {
