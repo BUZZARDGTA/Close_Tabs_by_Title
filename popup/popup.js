@@ -55,6 +55,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     const inputText = titleInput.value.trim(); // Remove leading and trailing whitespace
 
     if (inputText === "") {
+      await delay(0);
       resultMessage.textContent = "Please enter a title regular expression and try again.";
       resultMessage.style.color = "red";
       closeTabsButton.style.backgroundColor = "red";
@@ -82,7 +83,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     // Calculate the total count of tabs to close
     const tabs = await browser.tabs.query({}); // Query the updated list of tabs every time the button is clicked
     const totalTabsCount = tabs.length; // Count of tabs that match the search criteria
-    const tabsToClose =  tabs.filter(tab => regex.test(tab.title));
+    const tabsToClose = tabs.filter(tab => regex.test(tab.title));
     const totalTabsToClose = tabsToClose.length;
 
     // Check if there are tabs to close matching the regular expression
@@ -147,6 +148,12 @@ document.addEventListener("DOMContentLoaded", async function () {
     closeTabsButton.disabled = false;
     titleInput.focus() // TODO: NOT WORKING FOR SOME REASONS?
   };
+
+  async function delay(milliseconds) {
+    return new Promise(resolve => {
+      setTimeout(resolve, milliseconds);
+    });
+  }
 
   // Function to update the open tabs counter in real time
   async function updateOpenTabsCounter() {
