@@ -146,7 +146,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     resultMessage.textContent = message;
     closeTabsButton.style.backgroundColor = buttonColor;
     closeTabsButton.disabled = false;
-    titleInput.focus(); // TODO: THIS WILL NOT BE WORKING IF THE CURRENT TAB GOT CLOSED, that probably means the "popup.html" lost it's focus in the first place.
+    titleInput.focus(); // TODO: THIS WILL NOT BE WORKING IF THE CURRENT TAB THAT OPENED THE POPUP OF THE EXTENSION GOT CLOSED, that probably means that the "popup.html" then lost it's focus.
   };
 
   async function delay(milliseconds) {
