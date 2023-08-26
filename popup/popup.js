@@ -70,14 +70,14 @@ document.addEventListener("DOMContentLoaded", async function () {
     try {
       regex = new RegExp(inputText, "i"); // Case-insensitive regex
     } catch (error) {
-        if (error instanceof SyntaxError) {
-          resultMessage.textContent = "Please enter a valid regular expression and try again.";
-          resultMessage.style.color = "red";
-          closeTabsButton.style.backgroundColor = "red";
-          closeTabsButton.disabled = false;
-          titleInput.focus();
-          return;
-        }
+      if (error instanceof SyntaxError) {
+        resultMessage.textContent = "Please enter a valid regular expression and try again.";
+        resultMessage.style.color = "red";
+        closeTabsButton.style.backgroundColor = "red";
+        closeTabsButton.disabled = false;
+        titleInput.focus();
+        return;
+      }
     }
 
     // Calculate the total count of tabs to close
