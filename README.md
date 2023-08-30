@@ -6,7 +6,7 @@
 
 ## Requirements
 
-* [Mozilla Firefox](https://www.mozilla.org/en-US/firefox/) (v109.0)
+* [Mozilla Firefox](https://www.mozilla.org/en-US/firefox/) (v112.0)
 
 ## Credits
 
