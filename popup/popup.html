@@ -2,74 +2,33 @@
 <html lang="en-US">
 
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="author" content="IB_U_Z_Z_A_R_Dl">
   <title>Close Tabs by Title</title>
-  <style>
-    body {
-      width: 450px; /* Increase the width */
-      padding: 20px; /* Add padding for better spacing */
-      background-color: #333; /* Dark background color */
-      color: #fff; /* Text color */
-      font-family: Arial, sans-serif;
-    }
-
-    h1 {
-      font-size: 24px;
-    }
-
-    button {
-      background-color: #007bff;
-      color: #fff;
-      border: none;
-      padding: 10px 20px;
-      cursor: pointer;
-      font-size: 16px;
-    }
-
-    button:hover {
-      background-color: #0056b3;
-    }
-
-    p {
-      font-size: 18px;
-      margin-top: 20px;
-    }
-
-    #openTabsCounter {
-      font-weight: bold;
-    }
-
-    .input-container {
-      width: 95%;
-      overflow: hidden; /* Hide the overflow */
-    }
-
-    #titleInput {
-      width: 100%;
-      padding: 8px;
-      box-sizing: border-box; /* Include padding and border in the element's total width */
-      resize: none; /* Disable textarea resizing */
-      overflow-y: hidden; /* Hide the vertical scrollbar by default */
-      border: 1px solid #ccc;
-      height: 2.5em; /* Set a single line height */
-    }
-
-    #closeTabsButton {
-      margin-top: 10px; /* Add margin to separate the button from the textarea */
-    }
-  </style>
+  <link rel="shortcut icon" href="../../icons/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="../../icons/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="../../css/styles.css">
+  <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
+
+  <div id="settingsButton">
+    <img src="../../images/gear-icon.png" alt="Settings">
+  </div>
+
   <h1>Close Tabs by Title</h1>
   <div class="input-container">
     <textarea id="titleInput" placeholder="Title Regular Expression"></textarea>
   </div>
   <button id="closeTabsButton">Close Tabs</button>
-  <div id="loadingIndicator" style="display: none;">Loading...</div> <!-- Loading indicator -->
-  <p id="resultMessage"></p> <!-- Display result message here -->
+  <div style="display: none;">Loading...</div>
+  <p id="resultMessage"></p> <!-- Display "Close Tabs" result message here -->
   <p>Open Tabs: <span id="openTabsCounter">0</span><span id="tabsLoadingText"></span></p> <!-- Display both "open tabs counter" and "tabs loading text" here -->
 
-  <script src="popup.js"></script>
+  <script type="module" src="popup.js"></script>
+
 </body>
 
 </html>

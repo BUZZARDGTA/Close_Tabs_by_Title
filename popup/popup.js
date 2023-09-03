@@ -1,14 +1,24 @@
+import {retrieveSettings} from "../../shared/shared_functions.js";
+
 document.addEventListener("DOMContentLoaded", async function () {
+
+  const settingsButton = document.getElementById("settingsButton");
   const titleInput = document.getElementById("titleInput");
   const closeTabsButton = document.getElementById("closeTabsButton");
-  const resultMessage = document.getElementById("resultMessage");
   const openTabsCounter = document.getElementById("openTabsCounter");
   const tabsLoadingText = document.getElementById("tabsLoadingText");
+  const resultMessage = document.getElementById("resultMessage");
 
   const defaultSingleLineHeight = getComputedStyle(titleInput).height;
   const defaultcloseTabsButtonBackgroundColor = window.getComputedStyle(closeTabsButton).backgroundColor;
 
   titleInput.focus(); // Automatically focus on the title input field when the extension icon is clicked
+
+  // Add a click event listener to the settings button
+  settingsButton.addEventListener("click", function () {
+    browser.tabs.create({ url:"../../settings/settings.html", active: true });
+    window.close();
+  });
 
   // Adjust title input text area height to match content, but no larger than a single line
   titleInput.addEventListener("input", function () {
@@ -53,6 +63,8 @@ document.addEventListener("DOMContentLoaded", async function () {
     resultMessage.textContent = "Loading...";
     resultMessage.style.color = "white";
 
+    const settings = await retrieveSettings();
+
     const inputText = titleInput.value.trim(); // Remove leading and trailing whitespace
 
     if (inputText === "") {
@@ -65,11 +77,18 @@ document.addEventListener("DOMContentLoaded", async function () {
       return;
     }
 
+    let regexFlags; // Declare the regexFlags variable outside the if statement
+    if (settings.sensitiveSearch === true) {
+      regexFlags = "i";
+    } else {
+      regexFlags = undefined;
+    }
+
     let _regex; // Declare the regex variable outside the try block
 
     // Catch invalid regular expression errors
     try {
-      _regex = new RegExp(inputText, "i"); // Case-insensitive regex
+      _regex = new RegExp(inputText, regexFlags);
     } catch (error) {
       if (error instanceof SyntaxError) {
         await delay(200);
@@ -86,7 +105,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     // Calculate the total count of tabs to close
     const tabs = await browser.tabs.query({});
-    const tabsToClose = await findTabsByTitleRegex(tabs, regex)
+    const tabsToClose = await findTabsByTitleRegex(tabs, regex);
     const totalTabsCount = Number(tabs.length);
     const totalTabsToClose = Number(tabsToClose.length);
 
@@ -119,14 +138,14 @@ document.addEventListener("DOMContentLoaded", async function () {
       tabsToClose
     });
 
-    const remainingTabsToClose = await findTabsByTitleRegex(undefined, regex)
+    const remainingTabsToClose = await findTabsByTitleRegex(undefined, regex);
     const remainingTotalTabsToClose = Number(remainingTabsToClose.length);
     const tabsClosedCount = (totalTabsToClose - remainingTotalTabsToClose);
 
     // Create an array of information about the closed tabs, and output the information about the closed tabs to the console
     const closedTabs = findClosedTabs(tabsToClose, remainingTabsToClose);
     const closedTabsInfo = closedTabs.map((tab) => ({ title: tab.title, url: tab.url }));
-    console.log("Closed tabs:", closedTabsInfo)
+    console.log("Closed tabs:", closedTabsInfo);
 
     let message = "";
     let buttonColor = "";
@@ -154,7 +173,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   // This function filters an array of tabs to find those that are currently loading.
   function findTabsLoading(tabs) {
-    return tabs.filter(tab => tab.status === 'loading');
+    return tabs.filter(tab => tab.status === "loading");
   }
 
   // This function filters an array of tabs to find those that are marked for closure
@@ -187,7 +206,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     const tabsCounter = Number(tabs.length);
 
     openTabsCounter.textContent = tabsCounter
-    await updateTabsLoadingText()
+    await updateTabsLoadingText();
 
     async function updateTabsLoadingText() {
       const tabsStillLoading = findTabsLoading(tabs);

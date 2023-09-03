@@ -1,0 +1,60 @@
+body {
+  background-color: #333;
+  color: #fff;
+  width: 450px; /* Increase the width */
+  padding: 20px; /* Add padding for better spacing */
+}
+
+h1 {
+  font-size: 24px;
+}
+
+p {
+  font-size: 18px;
+  margin-top: 20px;
+}
+
+#openTabsCounter {
+  font-weight: bold;
+}
+
+.input-container {
+  width: 95%;
+  overflow: hidden; /* Hide the overflow */
+}
+
+#titleInput {
+  width: 100%;
+  padding: 8px;
+  box-sizing: border-box; /* Include padding and border in the element's total width */
+  resize: none; /* Disable textarea resizing */
+  overflow-y: hidden; /* Hide the vertical scrollbar by default */
+  border: 1px solid #ccc;
+  height: 2.5em; /* Set a single line height */
+}
+
+button#closeTabsButton {
+  margin-top: 10px; /* Add margin to separate the button from the textarea */
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+#settingsButton {
+  position: absolute;
+  top: 25px;
+  right: 25px;
+}
+
+#settingsButton img {
+  width: 24px;
+  height: 24px;
+}
+
+#settingsButton:hover img {
+  filter: brightness(100);
+  cursor: pointer;
+}
