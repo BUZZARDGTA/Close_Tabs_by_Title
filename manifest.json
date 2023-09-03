@@ -3,7 +3,10 @@
   "name": "Close Tabs by Title",
   "version": "1.7",
   "description": "Close tabs with a specific title using regular expressions.",
-  "author": "IB_U_Z_Z_A_R_Dl",
+  "developer": {
+    "name": "IB_U_Z_Z_A_R_Dl",
+    "url": "https://github.com/Illegal-Services"
+  },
   "permissions": [
     "tabs",
     "storage"
