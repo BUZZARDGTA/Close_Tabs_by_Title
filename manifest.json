@@ -4,12 +4,6 @@
   "version": "1.7",
   "description": "Close tabs with a specific title using regular expressions.",
   "author": "IB_U_Z_Z_A_R_Dl",
-  "browser_specific_settings": {
-    "gecko": {
-      "id": "Close_Tabs_by_Title@id",
-      "strict_min_version": "112.0"
-    }
-  },
   "permissions": [
     "tabs",
     "storage"
@@ -39,5 +33,15 @@
       "background/background.js"
     ],
     "type": "module"
+  },
+  "options_ui": {
+    "page": "settings/settings.html",
+    "open_in_tab": true
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "Close_Tabs_by_Title@id",
+      "strict_min_version": "112.0"
+    }
   }
 }
