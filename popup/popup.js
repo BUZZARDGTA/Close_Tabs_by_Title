@@ -77,15 +77,14 @@ document.addEventListener("DOMContentLoaded", async function () {
       return;
     }
 
-    let regexFlags; // Declare the regexFlags variable outside the if statement
+    let regexFlags; // Declare the 'regexFlags' variable outside the if statement
     if (settings.sensitiveSearch === true) {
       regexFlags = "i";
     } else {
       regexFlags = undefined;
     }
 
-    let _regex; // Declare the regex variable outside the try block
-
+    let _regex;  // Declare the '_regex' variable outside the the try block
     // Catch invalid regular expression errors
     try {
       _regex = new RegExp(inputText, regexFlags);
@@ -100,12 +99,11 @@ document.addEventListener("DOMContentLoaded", async function () {
         return;
       }
     }
-
     const regex = _regex;
 
     // Calculate the total count of tabs to close
     const tabs = await browser.tabs.query({});
-    const tabsToClose = await findTabsByTitleRegex(tabs, regex);
+    const tabsToClose = await findTabsByTitleRegex(settings, tabs, regex);
     const totalTabsCount = Number(tabs.length);
     const totalTabsToClose = Number(tabsToClose.length);
 
@@ -138,7 +136,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       tabsToClose
     });
 
-    const remainingTabsToClose = await findTabsByTitleRegex(undefined, regex);
+    const remainingTabsToClose = await findTabsByTitleRegex(settings, undefined, regex);
     const remainingTotalTabsToClose = Number(remainingTabsToClose.length);
     const tabsClosedCount = (totalTabsToClose - remainingTotalTabsToClose);
 
@@ -192,12 +190,22 @@ document.addEventListener("DOMContentLoaded", async function () {
   }
 
   // This asynchronous function filters an array of tabs using a regular expression pattern on their titles.
-  async function findTabsByTitleRegex(tabs, regex) {
+  async function findTabsByTitleRegex(settings, tabs, regex) {
     if (!tabs) {
       tabs = await browser.tabs.query({});
     }
 
+    if (settings.whitelistFirefoxReservedTabs === true) {
+      tabs = await filterFirefoxReservedTabs(tabs);
+    }
+
     return tabs.filter(tab => regex.test(tab.title));
+  }
+
+  // Function to filter out URLs starting with the specified prefixes
+  async function filterFirefoxReservedTabs(urls) {
+    const reservedPrefixesRegex = new RegExp(/^(about:|chrome:|resource:|moz-extension:|data:)/, "i");
+    return await urls.filter(object => !reservedPrefixesRegex.test(object.url));
   }
 
   // Function to update the "open tabs counter" and "tabs loading text" in real time
