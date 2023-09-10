@@ -1,4 +1,4 @@
-import {retrieveSettings} from "../../shared/shared_functions.js";
+import {retrieveSettings} from "../shared/shared_functions.js";
 
 document.addEventListener("DOMContentLoaded", async function () {
 
@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   // Add a click event listener to the settings button
   settingsButton.addEventListener("click", function () {
-    browser.tabs.create({ url:"../../settings/settings.html", active: true });
+    browser.tabs.create({ url:"../settings/settings.html", active: true });
     window.close();
   });
 
@@ -166,7 +166,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     closeTabsButton.style.backgroundColor = buttonColor;
     closeTabsButton.disabled = false;
     titleInput.focus(); // TODO: THIS WILL NOT BE WORKING IF THE CURRENT TAB THAT OPENED THE POPUP OF THE EXTENSION GOT CLOSED, that probably means that the "popup.html" then lost it's focus.
-
   }
 
   // This function filters an array of tabs to find those that are currently loading.

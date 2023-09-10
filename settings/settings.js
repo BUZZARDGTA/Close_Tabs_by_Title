@@ -1,4 +1,4 @@
-import {retrieveSettings, saveSettings} from "../../shared/shared_functions.js";
+import {retrieveSettings, saveSettings} from "../shared/shared_functions.js";
 
 document.addEventListener("DOMContentLoaded", async function () {
 
