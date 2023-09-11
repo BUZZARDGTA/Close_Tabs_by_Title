@@ -11,10 +11,8 @@ document.addEventListener("DOMContentLoaded", async function () {
   Subsequently, the HTML interface enables users to toggle checkboxes, and event listeners respond to these.
   */
   const currentSettings = await retrieveSettings();
-  if (currentSettings) {
-    checkboxInsensitiveTabSearch.checked = typeof currentSettings.sensitiveSearch === 'boolean' ? currentSettings.sensitiveSearch : false;
-    checkboxWhitelistFirefoxReservedTabs.checked = typeof currentSettings.whitelistFirefoxReservedTabs === 'boolean' ? currentSettings.whitelistFirefoxReservedTabs : false;
-  }
+  checkboxInsensitiveTabSearch.checked = typeof currentSettings.sensitiveSearch === 'boolean' ? currentSettings.sensitiveSearch : false;
+  checkboxWhitelistFirefoxReservedTabs.checked = typeof currentSettings.whitelistFirefoxReservedTabs === 'boolean' ? currentSettings.whitelistFirefoxReservedTabs : false;
 
   // Add event listeners for checkbox changes on the HTML settings page
   addCheckboxChangeListener(checkboxInsensitiveTabSearch, "sensitiveSearch");
