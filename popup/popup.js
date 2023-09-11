@@ -63,7 +63,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     resultMessage.textContent = "Loading...";
     resultMessage.style.color = "white";
 
-    const settings = await retrieveSettings();
+    const settings = await retrieveSettings(["sensitiveSearch", "whitelistFirefoxReservedTabs"]);
 
     const inputText = titleInput.value.trim(); // Remove leading and trailing whitespace
 

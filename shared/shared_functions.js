@@ -1,8 +1,8 @@
 export { retrieveSettings, saveSettings };
 
 // Retrieve settings from local storage
-async function retrieveSettings() {
-  const settings = await browser.storage.local.get();
+async function retrieveSettings(settingsToRetrieve) {
+  const settings = await browser.storage.local.get(settingsToRetrieve);
   return settings;
 }
 
