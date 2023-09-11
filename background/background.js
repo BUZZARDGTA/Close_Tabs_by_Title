@@ -4,7 +4,7 @@ import {saveSettings} from "../shared/shared_functions.js";
 browser.runtime.onInstalled.addListener(async (details) => {
   if (details.reason === "install") {
     await saveSettings({
-      sensitiveSearch: false,
+      sensitiveSearch: true,
       whitelistFirefoxReservedTabs: false
     });
   }
