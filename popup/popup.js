@@ -63,7 +63,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     resultMessage.textContent = "Loading...";
     resultMessage.style.color = "white";
 
-    const settings = await retrieveSettings(["sensitiveSearch", "whitelistFirefoxReservedTabs"]);
+    const settings = await retrieveSettings(["insensitiveSearch", "whitelistFirefoxReservedTabs"]);
 
     const inputText = titleInput.value.trim(); // Remove leading and trailing whitespace
 
@@ -78,7 +78,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     let regexFlags; // Declare the 'regexFlags' variable outside the if statement
-    if (settings.sensitiveSearch === true) {
+    if (settings.insensitiveSearch === true) {
       regexFlags = "i";
     } else {
       regexFlags = undefined;
@@ -166,6 +166,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     closeTabsButton.style.backgroundColor = buttonColor;
     closeTabsButton.disabled = false;
     titleInput.focus(); // TODO: THIS WILL NOT BE WORKING IF THE CURRENT TAB THAT OPENED THE POPUP OF THE EXTENSION GOT CLOSED, that probably means that the "popup.html" then lost it's focus.
+    return;
   }
 
   // This function filters an array of tabs to find those that are currently loading.
