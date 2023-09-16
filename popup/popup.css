@@ -34,7 +34,7 @@ p {
 }
 
 button#closeTabsButton {
-  margin-top: 10px; /* Add margin to separate the button from the textarea */
+  margin-top: 10px;
   background-color: #007bff;
   color: #fff;
   border: none;
