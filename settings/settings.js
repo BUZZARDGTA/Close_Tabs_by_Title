@@ -4,10 +4,8 @@ document.addEventListener("DOMContentLoaded", async function () {
   const checkboxInsensitiveTabSearch = document.getElementById("checkboxInsensitiveTabSearch");
   const checkboxWhitelistFirefoxReservedTabs = document.getElementById("checkboxWhitelistFirefoxReservedTabs");
 
-  /*
-  This initialize HTML checkboxes to match internal storage values.
-  Subsequently, the HTML interface enables users to toggle checkboxes, and event listeners respond to these.
-  */
+  // This initialize HTML checkboxes to match internal storage values.
+  // Subsequently, the HTML interface enables users to toggle checkboxes, and event listeners respond to these.
   const currentSettings = await retrieveSettings();
   checkboxInsensitiveTabSearch.checked = typeof currentSettings.insensitiveSearch === "boolean" ? currentSettings.insensitiveSearch : false;
   checkboxWhitelistFirefoxReservedTabs.checked = typeof currentSettings.whitelistFirefoxReservedTabs === "boolean" ? currentSettings.whitelistFirefoxReservedTabs : false;
@@ -16,6 +14,10 @@ document.addEventListener("DOMContentLoaded", async function () {
   addCheckboxChangeListener(checkboxInsensitiveTabSearch, "insensitiveSearch");
   addCheckboxChangeListener(checkboxWhitelistFirefoxReservedTabs, "whitelistFirefoxReservedTabs");
 
+  /**
+   * @param {HTMLElement} checkboxHtmlId
+   * @param {string} localStorageKey
+   */
   function addCheckboxChangeListener(checkboxHtmlId, localStorageKey) {
     checkboxHtmlId.addEventListener("change", async () => {
       const settingsObj = { [localStorageKey]: checkboxHtmlId.checked }; // Create a settings object with a dynamic key based on localStorageKey and set its value to the checked state of the checkbox element

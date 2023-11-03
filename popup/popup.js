@@ -167,13 +167,20 @@ document.addEventListener("DOMContentLoaded", async function () {
     return;
   }
 
-  // This function filters an array of tabs to find those that are currently loading.
+  /**
+   * This function filters an array of tabs to find those that are currently loading.
+   * @param {Array} tabs
+   */
   function findTabsLoading(tabs) {
     return tabs.filter((tab) => tab.status === "loading");
   }
 
-  // This function filters an array of tabs to find those that are marked for closure
-  // but are not present in the array of tabs that are intended to remain open.
+  /**
+   * This function filters an array of tabs to find those that are marked for closure
+   * but are not present in the array of tabs that are intended to remain open.
+   * @param {Array} tabsToClose
+   * @param {Array} remainingTabsToClose
+   */
   function findClosedTabs(tabsToClose, remainingTabsToClose) {
     return tabsToClose.filter((tabToClose) => !remainingTabsToClose.some((remainingTabToClose) => remainingTabToClose.id === tabToClose.id));
   }
@@ -186,14 +193,22 @@ document.addEventListener("DOMContentLoaded", async function () {
     return urls.filter((object) => !reservedPrefixesRegex.test(object.url));
   }
 
-  // This function creates a pause in code execution for a specified number of milliseconds.
+  /**
+   * This function creates a pause in code execution for a specified number of milliseconds.
+   * @param {number} milliseconds
+   */
   function delay(milliseconds) {
     return new Promise((resolve) => {
       setTimeout(resolve, milliseconds);
     });
   }
 
-  // This asynchronous function filters an array of tabs using a regular expression pattern on their titles.
+  /**
+   * This asynchronous function filters an array of tabs using a regular expression pattern on their titles.
+   * @param {object} settings
+   * @param {Array | undefined} tabs
+   * @param {RegExp} regex
+   */
   async function findTabsByTitleRegex(settings, tabs, regex) {
     if (!tabs) {
       tabs = await browser.tabs.query({});
@@ -213,7 +228,9 @@ document.addEventListener("DOMContentLoaded", async function () {
     });
   }
 
-  // Function to update the "open tabs counter" and "tabs loading text" in real time
+  /**
+   * Function to update the "open tabs counter" and "tabs loading text" in real time
+   */
   async function updateOpenTabsCounter() {
     const tabs = await browser.tabs.query({});
     const tabsCounter = Number(tabs.length);
