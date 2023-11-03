@@ -1,4 +1,5 @@
-import { retrieveSettings, saveSettings } from "../shared/shared_functions.js";
+import { retrieveSettings } from "/js/retrieveSettings.js";
+import { saveSettings } from "/js/saveSettings.js";
 
 document.addEventListener("DOMContentLoaded", async function () {
   const checkboxInsensitiveTabSearch = document.getElementById("checkboxInsensitiveTabSearch");

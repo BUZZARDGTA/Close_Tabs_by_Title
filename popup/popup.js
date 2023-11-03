@@ -1,4 +1,4 @@
-import { retrieveSettings } from "../shared/shared_functions.js";
+import { retrieveSettings } from "/js/retrieveSettings.js";
 
 document.addEventListener("DOMContentLoaded", async function () {
   const settingsButton = document.getElementById("settingsButton");
@@ -236,9 +236,9 @@ document.addEventListener("DOMContentLoaded", async function () {
     const tabsCounter = Number(tabs.length);
 
     openTabsCounter.textContent = tabsCounter;
-    await updateTabsLoadingText();
+    updateTabsLoadingText();
 
-    async function updateTabsLoadingText() {
+    function updateTabsLoadingText() {
       const tabsStillLoading = findTabsLoading(tabs);
       const tabsStillLoadingCounter = Number(tabsStillLoading.length);
 
@@ -249,8 +249,6 @@ document.addEventListener("DOMContentLoaded", async function () {
       }
     }
   }
-
-  updateOpenTabsCounter(); // Initial update of open tabs counter
 
   setInterval(updateOpenTabsCounter, 100); // Set up a timer to periodically update the open tabs counter
 });
