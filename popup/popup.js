@@ -1,7 +1,6 @@
-import {retrieveSettings} from "../shared/shared_functions.js";
+import { retrieveSettings } from "../shared/shared_functions.js";
 
 document.addEventListener("DOMContentLoaded", async function () {
-
   const settingsButton = document.getElementById("settingsButton");
   const titleInput = document.getElementById("titleInput");
   const closeTabsButton = document.getElementById("closeTabsButton");
@@ -16,7 +15,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   // Add a click event listener to the settings button
   settingsButton.addEventListener("click", function () {
-    browser.tabs.create({ url:"../settings/settings.html", active: true });
+    browser.tabs.create({ url: "../settings/settings.html", active: true });
     window.close();
   });
 
@@ -31,7 +30,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   });
 
   // Replacing pasted text's new lines to literal "\n" in the regular expression, because tab titles cannot contain a new line character.
-  titleInput.addEventListener("paste", async function(event) {
+  titleInput.addEventListener("paste", async function (event) {
     if (document.activeElement === titleInput) {
       event.preventDefault(); // Prevent the default paste behavior
 
@@ -84,10 +83,10 @@ document.addEventListener("DOMContentLoaded", async function () {
       regexFlags = undefined;
     }
 
-    let _regex;  // Declare the '_regex' variable outside the the try block
+    let regex; // Declare the '_regex' variable outside the the try block
     // Catch invalid regular expression errors
     try {
-      _regex = new RegExp(inputText, regexFlags);
+      regex = new RegExp(inputText, regexFlags);
     } catch (error) {
       if (error instanceof SyntaxError) {
         await delay(200);
@@ -99,7 +98,6 @@ document.addEventListener("DOMContentLoaded", async function () {
         return;
       }
     }
-    const regex = _regex;
 
     // Calculate the total count of tabs to close
     const tabs = await browser.tabs.query({});
@@ -133,12 +131,12 @@ document.addEventListener("DOMContentLoaded", async function () {
     // Send a message to the extension's background script to initiate the closing of tabs
     await browser.runtime.sendMessage({
       action: "closeTabs",
-      tabsToClose
+      tabsToClose,
     });
 
     const remainingTabsToClose = await findTabsByTitleRegex(settings, undefined, regex);
     const remainingTotalTabsToClose = Number(remainingTabsToClose.length);
-    const tabsClosedCount = (totalTabsToClose - remainingTotalTabsToClose);
+    const tabsClosedCount = totalTabsToClose - remainingTotalTabsToClose;
 
     // Create an array of information about the closed tabs, and output the information about the closed tabs to the console
     const closedTabs = findClosedTabs(tabsToClose, remainingTabsToClose);
@@ -171,20 +169,26 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   // This function filters an array of tabs to find those that are currently loading.
   function findTabsLoading(tabs) {
-    return tabs.filter(tab => tab.status === "loading");
+    return tabs.filter((tab) => tab.status === "loading");
   }
 
   // This function filters an array of tabs to find those that are marked for closure
   // but are not present in the array of tabs that are intended to remain open.
   function findClosedTabs(tabsToClose, remainingTabsToClose) {
-    return tabsToClose.filter((tabToClose) =>
-      !remainingTabsToClose.some((remainingTabToClose) => remainingTabToClose.id === tabToClose.id)
-    );
+    return tabsToClose.filter((tabToClose) => !remainingTabsToClose.some((remainingTabToClose) => remainingTabToClose.id === tabToClose.id));
+  }
+
+  /**
+   * @param {Array} urls
+   */
+  function filterFirefoxReservedTabs(urls) {
+    const reservedPrefixesRegex = new RegExp(/^(about|chrome|resource|moz-extension|data):/i);
+    return urls.filter((object) => !reservedPrefixesRegex.test(object.url));
   }
 
   // This function creates a pause in code execution for a specified number of milliseconds.
   function delay(milliseconds) {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       setTimeout(resolve, milliseconds);
     });
   }
@@ -196,16 +200,17 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     if (settings.whitelistFirefoxReservedTabs === true) {
-      tabs = await filterFirefoxReservedTabs(tabs);
+      tabs = filterFirefoxReservedTabs(tabs);
     }
 
-    return tabs.filter(tab => regex.test(tab.title));
-  }
-
-  // Function to filter out URLs starting with the specified prefixes
-  async function filterFirefoxReservedTabs(urls) {
-    const reservedPrefixesRegex = new RegExp(/^(about:|chrome:|resource:|moz-extension:|data:)/, "i");
-    return await urls.filter(object => !reservedPrefixesRegex.test(object.url));
+    return tabs.filter((tab) => {
+      try {
+        return regex.test(tab.title);
+      } catch (error) {
+        console.error("Error testing regex:", error);
+        return false; // Handle the error gracefully
+      }
+    });
   }
 
   // Function to update the "open tabs counter" and "tabs loading text" in real time
@@ -213,7 +218,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     const tabs = await browser.tabs.query({});
     const tabsCounter = Number(tabs.length);
 
-    openTabsCounter.textContent = tabsCounter
+    openTabsCounter.textContent = tabsCounter;
     await updateTabsLoadingText();
 
     async function updateTabsLoadingText() {
@@ -231,5 +236,4 @@ document.addEventListener("DOMContentLoaded", async function () {
   updateOpenTabsCounter(); // Initial update of open tabs counter
 
   setInterval(updateOpenTabsCounter, 100); // Set up a timer to periodically update the open tabs counter
-
 });

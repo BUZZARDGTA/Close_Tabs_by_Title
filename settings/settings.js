@@ -1,23 +1,20 @@
-import {retrieveSettings, saveSettings} from "../shared/shared_functions.js";
+import { retrieveSettings, saveSettings } from "../shared/shared_functions.js";
 
 document.addEventListener("DOMContentLoaded", async function () {
-
   const checkboxInsensitiveTabSearch = document.getElementById("checkboxInsensitiveTabSearch");
   const checkboxWhitelistFirefoxReservedTabs = document.getElementById("checkboxWhitelistFirefoxReservedTabs");
-
 
   /*
   This initialize HTML checkboxes to match internal storage values.
   Subsequently, the HTML interface enables users to toggle checkboxes, and event listeners respond to these.
   */
   const currentSettings = await retrieveSettings();
-  checkboxInsensitiveTabSearch.checked = typeof currentSettings.insensitiveSearch === 'boolean' ? currentSettings.insensitiveSearch : false;
-  checkboxWhitelistFirefoxReservedTabs.checked = typeof currentSettings.whitelistFirefoxReservedTabs === 'boolean' ? currentSettings.whitelistFirefoxReservedTabs : false;
+  checkboxInsensitiveTabSearch.checked = typeof currentSettings.insensitiveSearch === "boolean" ? currentSettings.insensitiveSearch : false;
+  checkboxWhitelistFirefoxReservedTabs.checked = typeof currentSettings.whitelistFirefoxReservedTabs === "boolean" ? currentSettings.whitelistFirefoxReservedTabs : false;
 
   // Add event listeners for checkbox changes on the HTML settings page
   addCheckboxChangeListener(checkboxInsensitiveTabSearch, "insensitiveSearch");
   addCheckboxChangeListener(checkboxWhitelistFirefoxReservedTabs, "whitelistFirefoxReservedTabs");
-
 
   function addCheckboxChangeListener(checkboxHtmlId, localStorageKey) {
     checkboxHtmlId.addEventListener("change", async () => {
@@ -25,5 +22,4 @@ document.addEventListener("DOMContentLoaded", async function () {
       await saveSettings(settingsObj); // Saving the settings based on checkbox changes
     });
   }
-
 });
