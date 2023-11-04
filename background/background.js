@@ -5,8 +5,9 @@ import { initializeTabsClosing } from "/js/initializeTabsClosing.js";
 browser.runtime.onInstalled.addListener(async (details) => {
   if (details.reason === "install") {
     await saveSettings({
+      preserveTabsByTitle: false,
       insensitiveSearch: false,
-      whitelistFirefoxReservedTabs: false,
+      whitelistFirefoxReservedTabs: true,
     });
   }
 });

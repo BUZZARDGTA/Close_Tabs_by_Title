@@ -1,9 +1,12 @@
 import { retrieveSettings } from "/js/retrieveSettings.js";
+import { saveSettings } from "/js/saveSettings.js";
+import { handleSettingChange } from "/js/handleSettingChange.js";
 
 document.addEventListener("DOMContentLoaded", async function () {
   const settingsButton = document.getElementById("settingsButton");
   const titleInput = document.getElementById("titleInput");
   const closeTabsButton = document.getElementById("closeTabsButton");
+  const switchButton = document.getElementById("switchButton");
   const openTabsCounter = document.getElementById("openTabsCounter");
   const tabsLoadingText = document.getElementById("tabsLoadingText");
   const resultMessage = document.getElementById("resultMessage");
@@ -13,9 +16,17 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   titleInput.focus(); // Automatically focus on the title input field when the extension icon is clicked
 
+  if ((await retrieveSettings("preserveTabsByTitle")).preserveTabsByTitle) {
+    closeTabsButton.textContent = "Preserve Tabs";
+    switchButton.checked = true;
+  } else {
+    closeTabsButton.textContent = "Close Tabs";
+    switchButton.checked = false;
+  }
+
   // Add a click event listener to the settings button
   settingsButton.addEventListener("click", function () {
-    browser.tabs.create({ url: "../settings/settings.html", active: true });
+    browser.tabs.create({ url: "/settings/settings.html", active: true });
     window.close();
   });
 
@@ -51,18 +62,36 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
   });
 
-  // Add a click event listener to the titleInput
   closeTabsButton.addEventListener("click", async () => {
     await closeOpenTabs();
   });
 
+  switchButton.addEventListener("click", async () => {
+    await handleSwitchButton();
+  });
+
+  browser.storage.onChanged.addListener((changes, areaName) => {
+    handleSettingChange(changes, areaName, {
+      preserveTabsByTitle: switchButton,
+    });
+    if (areaName !== "local") {
+      return;
+    }
+    if (changes.hasOwnProperty("preserveTabsByTitle")) {
+      const newValue = changes["preserveTabsByTitle"].newValue;
+      closeTabsButton.textContent = newValue ? "Preserve Tabs" : "Close Tabs";
+      closeTabsButton.style.backgroundColor = defaultcloseTabsButtonBackgroundColor;
+      resultMessage.textContent = "";
+    }
+  });
+
   async function closeOpenTabs() {
     closeTabsButton.disabled = true;
-    closeTabsButton.style.backgroundColor = "blue";
+    closeTabsButton.style.backgroundColor = defaultcloseTabsButtonBackgroundColor;
     resultMessage.textContent = "Loading...";
     resultMessage.style.color = "white";
 
-    const settings = await retrieveSettings(["insensitiveSearch", "whitelistFirefoxReservedTabs"]);
+    const settings = await retrieveSettings(["preserveTabsByTitle", "insensitiveSearch", "whitelistFirefoxReservedTabs"]);
 
     const inputText = titleInput.value.trim(); // Remove leading and trailing whitespace
 
@@ -83,7 +112,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       regexFlags = undefined;
     }
 
-    let regex; // Declare the '_regex' variable outside the the try block
+    let regex; // Declare the 'regex' variable outside the the try block
     // Catch invalid regular expression errors
     try {
       regex = new RegExp(inputText, regexFlags);
@@ -100,10 +129,22 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     // Calculate the total count of tabs to close
-    const tabs = await browser.tabs.query({});
-    const tabsToClose = await findTabsByTitleRegex(settings, tabs, regex);
-    const totalTabsCount = Number(tabs.length);
-    const totalTabsToClose = Number(tabsToClose.length);
+    let tabs, filteredTabs, userInputTabs, tabsToClose;
+
+    tabs = await browser.tabs.query({});
+
+    if (settings.whitelistFirefoxReservedTabs) {
+      filteredTabs = filterFirefoxReservedTabs(tabs);
+    } else {
+      filteredTabs = tabs;
+    }
+
+    userInputTabs = await findTabsByTitleRegex(filteredTabs, regex);
+
+    ({ tabsToClose } = getTabsToPreserveAndClose(settings, userInputTabs, filteredTabs));
+
+    const totalTabsCount = tabs.length;
+    const totalTabsToClose = tabsToClose.length;
 
     // Check if there are tabs to close matching the regular expression
     if (totalTabsToClose <= 0) {
@@ -134,13 +175,12 @@ document.addEventListener("DOMContentLoaded", async function () {
       tabsToClose,
     });
 
-    const remainingTabsToClose = await findTabsByTitleRegex(settings, undefined, regex);
-    const remainingTotalTabsToClose = Number(remainingTabsToClose.length);
-    const tabsClosedCount = totalTabsToClose - remainingTotalTabsToClose;
+    tabs = await browser.tabs.query({});
 
     // Create an array of information about the closed tabs, and output the information about the closed tabs to the console
-    const closedTabs = findClosedTabs(tabsToClose, remainingTabsToClose);
+    const closedTabs = findClosedTabs(tabsToClose, tabs);
     const closedTabsInfo = closedTabs.map((tab) => ({ title: tab.title, url: tab.url }));
+    const tabsClosedCount = closedTabs.length;
     console.log("Closed tabs:", closedTabsInfo);
 
     let message = "";
@@ -167,6 +207,18 @@ document.addEventListener("DOMContentLoaded", async function () {
     return;
   }
 
+  async function handleSwitchButton() {
+    if (switchButton.checked) {
+      await saveSettings({ preserveTabsByTitle: true });
+      closeTabsButton.textContent = "Preserve Tabs";
+    } else {
+      await saveSettings({ preserveTabsByTitle: false });
+      closeTabsButton.textContent = "Close Tabs";
+    }
+    closeTabsButton.style.backgroundColor = defaultcloseTabsButtonBackgroundColor;
+    resultMessage.textContent = "";
+  }
+
   /**
    * This function filters an array of tabs to find those that are currently loading.
    * @param {Array} tabs
@@ -176,21 +228,20 @@ document.addEventListener("DOMContentLoaded", async function () {
   }
 
   /**
-   * This function filters an array of tabs to find those that are marked for closure
-   * but are not present in the array of tabs that are intended to remain open.
+   * This function filters two arrays of tabs to find those that has been closed.
    * @param {Array} tabsToClose
-   * @param {Array} remainingTabsToClose
+   * @param {Array} tabs
    */
-  function findClosedTabs(tabsToClose, remainingTabsToClose) {
-    return tabsToClose.filter((tabToClose) => !remainingTabsToClose.some((remainingTabToClose) => remainingTabToClose.id === tabToClose.id));
+  function findClosedTabs(tabsToClose, tabs) {
+    return tabsToClose.filter((tabToClose) => !tabs.some((tab) => tab.id === tabToClose.id));
   }
 
   /**
    * @param {Array} urls
    */
-  function filterFirefoxReservedTabs(urls) {
-    const reservedPrefixesRegex = new RegExp(/^(about|chrome|resource|moz-extension|data):/i);
-    return urls.filter((object) => !reservedPrefixesRegex.test(object.url));
+  function filterFirefoxReservedTabs(tabs) {
+    const reservedPrefixesRegex = new RegExp(/^(about|chrome|resource|moz-extension|data|view-source):/i);
+    return tabs.filter((object) => !reservedPrefixesRegex.test(object.url));
   }
 
   /**
@@ -206,26 +257,32 @@ document.addEventListener("DOMContentLoaded", async function () {
   /**
    * This asynchronous function filters an array of tabs using a regular expression pattern on their titles.
    * @param {object} settings
-   * @param {Array | undefined} tabs
+   * @param {Array} tabs
    * @param {RegExp} regex
    */
-  async function findTabsByTitleRegex(settings, tabs, regex) {
-    if (!tabs) {
-      tabs = await browser.tabs.query({});
+  async function findTabsByTitleRegex(tabs, regex) {
+    return tabs.filter((tab) => regex.test(tab.title));
+  }
+
+  /**
+   * This function determines which tabs to preserve and which tabs to close
+   * based on the provided settings, user-defined tabs, and filtered tabs.
+   * @param {object} settings
+   * @param {Array} userInputTabs
+   * @param {Array} filteredTabs
+   */
+  function getTabsToPreserveAndClose(settings, userInputTabs, filteredTabs) {
+    let tabsToPreserve, tabsToClose;
+
+    if (settings.preserveTabsByTitle) {
+      tabsToPreserve = userInputTabs;
+      tabsToClose = filteredTabs.filter((tab) => !tabsToPreserve.includes(tab));
+    } else {
+      tabsToClose = userInputTabs;
+      tabsToPreserve = filteredTabs.filter((tab) => !tabsToClose.includes(tab));
     }
 
-    if (settings.whitelistFirefoxReservedTabs === true) {
-      tabs = filterFirefoxReservedTabs(tabs);
-    }
-
-    return tabs.filter((tab) => {
-      try {
-        return regex.test(tab.title);
-      } catch (error) {
-        console.error("Error testing regex:", error);
-        return false; // Handle the error gracefully
-      }
-    });
+    return { tabsToPreserve, tabsToClose };
   }
 
   /**
@@ -233,14 +290,14 @@ document.addEventListener("DOMContentLoaded", async function () {
    */
   async function updateOpenTabsCounter() {
     const tabs = await browser.tabs.query({});
-    const tabsCounter = Number(tabs.length);
+    const tabsCounter = tabs.length;
 
     openTabsCounter.textContent = tabsCounter;
     updateTabsLoadingText();
 
     function updateTabsLoadingText() {
       const tabsStillLoading = findTabsLoading(tabs);
-      const tabsStillLoadingCounter = Number(tabsStillLoading.length);
+      const tabsStillLoadingCounter = tabsStillLoading.length;
 
       if (tabsStillLoadingCounter > 0) {
         tabsLoadingText.textContent = ` (${tabsStillLoadingCounter} ${tabsStillLoadingCounter === 1 ? "tab is" : "tabs are"} loading)`;

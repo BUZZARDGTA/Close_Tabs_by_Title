@@ -13,7 +13,6 @@
 </head>
 
 <body>
-
   <div id="settingsButton">
     <img src="/svgs/settings.svg" alt="Settings">
   </div>
@@ -22,13 +21,21 @@
   <div class="input-container">
     <textarea id="titleInput" placeholder="Title Regular Expression"></textarea>
   </div>
-  <button id="closeTabsButton">Close Tabs</button>
+  <div class="actions-container">
+    <button id="closeTabsButton">Close Tabs</button>
+    <label class="switch">
+      <input id="switchButton" type="checkbox">
+      <span class="slider"></span>
+    </label>
+  </div>
+
   <div style="display: none;">Loading...</div>
-  <p id="resultMessage"></p> <!-- Display "Close Tabs" result message here -->
-  <p>Open Tabs: <span id="openTabsCounter">0</span><span id="tabsLoadingText"></span></p> <!-- Display both "open tabs counter" and "tabs loading text" here -->
+  <p id="resultMessage"><!-- Display "Close Tabs" result message here --></p>
+  <p>
+    Open Tabs: <span id="openTabsCounter">0</span><span id="tabsLoadingText"><!-- Display "tabs loading text" here --></span>
+  </p>
 
   <script type="module" src="popup.js"></script>
-
 </body>
 
 </html>
