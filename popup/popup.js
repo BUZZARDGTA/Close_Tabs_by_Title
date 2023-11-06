@@ -14,15 +14,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   const defaultSingleLineHeight = getComputedStyle(titleInput).height;
   const defaultcloseTabsButtonBackgroundColor = window.getComputedStyle(closeTabsButton).backgroundColor;
 
-  titleInput.focus(); // Automatically focus on the title input field when the extension icon is clicked
-
-  if ((await retrieveSettings("preserveTabsByTitle")).preserveTabsByTitle) {
-    switchButton.checked = true;
-    closeTabsButton.textContent = "Preserve Tabs";
-  } else {
-    switchButton.checked = false;
-    closeTabsButton.textContent = "Close Tabs";
-  }
+  updateUI({ init: "popup" });
 
   // Add a click event listener to the settings button
   settingsButton.addEventListener("click", function () {
@@ -71,25 +63,22 @@ document.addEventListener("DOMContentLoaded", async function () {
   });
 
   browser.storage.onChanged.addListener((changes, areaName) => {
-    handleSettingChange(changes, areaName, {
-      preserveTabsByTitle: switchButton,
-    });
     if (areaName !== "local") {
       return;
     }
+
+    handleSettingChange(changes, areaName, {
+      preserveTabsByTitle: switchButton,
+    });
+
     if (changes.hasOwnProperty("preserveTabsByTitle")) {
       const newValue = changes["preserveTabsByTitle"].newValue;
-      closeTabsButton.textContent = newValue ? "Preserve Tabs" : "Close Tabs";
-      closeTabsButton.style.backgroundColor = defaultcloseTabsButtonBackgroundColor;
-      resultMessage.textContent = "";
+      updateUI({ switchButton: newValue });
     }
   });
 
   async function closeOpenTabs() {
-    closeTabsButton.disabled = true;
-    closeTabsButton.style.backgroundColor = defaultcloseTabsButtonBackgroundColor;
-    resultMessage.textContent = "Loading...";
-    resultMessage.style.color = "white";
+    updateUI({ loading: true });
 
     const settings = await retrieveSettings(["preserveTabsByTitle", "insensitiveSearch", "whitelistFirefoxReservedTabs"]);
 
@@ -97,33 +86,24 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     if (inputText === "") {
       await delay(200); // Adds a short delay to ensure that the "Loading..." text remains readable, even while spamming the "Close Tabs" button
-      resultMessage.textContent = "Please enter a title regular expression and try again.";
-      resultMessage.style.color = "red";
-      closeTabsButton.style.backgroundColor = "red";
-      closeTabsButton.disabled = false;
-      titleInput.focus();
+      updateUI({ error: "Please enter a title regular expression and try again." });
       return;
     }
 
     let regexFlags; // Declare the 'regexFlags' variable outside the if statement
-    if (settings.insensitiveSearch === true) {
+    if (settings.insensitiveSearch) {
       regexFlags = "i";
     } else {
       regexFlags = undefined;
     }
 
-    let regex; // Declare the 'regex' variable outside the the try block
-    // Catch invalid regular expression errors
+    let regex;
     try {
       regex = new RegExp(inputText, regexFlags);
     } catch (error) {
       if (error instanceof SyntaxError) {
         await delay(200);
-        resultMessage.textContent = "Please enter a valid regular expression and try again.";
-        resultMessage.style.color = "red";
-        closeTabsButton.style.backgroundColor = "red";
-        closeTabsButton.disabled = false;
-        titleInput.focus();
+        updateUI({ error: "Please enter a valid regular expression and try again." });
         return;
       }
     }
@@ -149,11 +129,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     // Check if there are tabs to close matching the regular expression
     if (totalTabsToClose <= 0) {
       await delay(200);
-      resultMessage.textContent = "No open tabs matching this regular expression found.";
-      resultMessage.style.color = "red";
-      closeTabsButton.style.backgroundColor = "red";
-      closeTabsButton.disabled = false;
-      titleInput.focus();
+      updateUI({ error: "No open tabs matching this regular expression found." });
       return;
     }
 
@@ -161,10 +137,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (totalTabsCount === totalTabsToClose) {
       await delay(200);
       if (!confirm("You are about to close all open tabs, which will result in exiting your browser.\n\nAre you sure you want to proceed?")) {
-        resultMessage.textContent = "";
-        closeTabsButton.style.backgroundColor = defaultcloseTabsButtonBackgroundColor;
-        closeTabsButton.disabled = false;
-        titleInput.focus();
+        updateUI({ init: true });
         return;
       }
     }
@@ -183,27 +156,16 @@ document.addEventListener("DOMContentLoaded", async function () {
     const tabsClosedCount = closedTabs.length;
     console.log("Closed tabs:", closedTabsInfo);
 
-    let message = "";
-    let buttonColor = "";
-
     if (tabsClosedCount > 0) {
-      message = `${tabsClosedCount} ${tabsClosedCount === 1 ? "tab" : "tabs"} with a matching title have been closed out of ${totalTabsCount} ${totalTabsCount === 1 ? "tab" : "tabs"}.`;
-      buttonColor = "green";
+      updateUI({ success: `${tabsClosedCount} ${tabsClosedCount === 1 ? "tab" : "tabs"} with a matching title have been closed out of ${totalTabsCount} ${totalTabsCount === 1 ? "tab" : "tabs"}.` });
     } else if (tabsClosedCount === 0) {
-      message = "No open tabs to close.";
-      resultMessage.style.color = "red";
-      buttonColor = "red";
+      await delay(200);
+      updateUI({ error: "No open tabs to close." });
     } else {
-      message = "No tabs with matching title found.";
-      resultMessage.style.color = "red";
-      buttonColor = "red";
+      await delay(200);
+      updateUI({ error: "No tabs with matching title found." });
     }
 
-    // Display the result message and set button color
-    resultMessage.textContent = message;
-    closeTabsButton.style.backgroundColor = buttonColor;
-    closeTabsButton.disabled = false;
-    titleInput.focus(); // TODO: THIS WILL NOT BE WORKING IF THE CURRENT TAB THAT OPENED THE POPUP OF THE EXTENSION GOT CLOSED, that probably means that the "popup.html" then lost it's focus.
     return;
   }
 
@@ -277,6 +239,62 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     return { tabsToPreserve, tabsToClose };
+  }
+
+  /**
+   * Update the UI based on the given options
+   * @param {object} options
+   */
+  async function updateUI(options) {
+    if (options.loading) {
+      closeTabsButton.disabled = true;
+      switchButton.disabled = true;
+      resultMessage.textContent = "Loading...";
+      resultMessage.style.color = "white";
+      closeTabsButton.style.backgroundColor = defaultcloseTabsButtonBackgroundColor;
+    } else if (options.error) {
+      resultMessage.textContent = options.error;
+      resultMessage.style.color = "red";
+      closeTabsButton.style.backgroundColor = "red";
+      closeTabsButton.disabled = false;
+      switchButton.disabled = false;
+      titleInput.focus();
+    } else if (options.success) {
+      resultMessage.textContent = options.success;
+      resultMessage.style.color = "white";
+      closeTabsButton.style.backgroundColor = "green";
+      closeTabsButton.disabled = false;
+      switchButton.disabled = false;
+      titleInput.focus();
+    } else {
+      let preserveTabsByTitle;
+
+      if (options.init) {
+        if (options.init === "popup") {
+          preserveTabsByTitle = (await retrieveSettings("preserveTabsByTitle")).preserveTabsByTitle;
+          switchButton.checked = preserveTabsByTitle;
+        }
+
+        resultMessage.textContent = "";
+        resultMessage.style.color = "white";
+        closeTabsButton.style.backgroundColor = defaultcloseTabsButtonBackgroundColor;
+        closeTabsButton.disabled = false;
+        switchButton.disabled = false;
+        titleInput.focus();
+      }
+
+      if (options.hasOwnProperty("switchButton")) {
+        preserveTabsByTitle = options.switchButton;
+        resultMessage.textContent = "";
+        resultMessage.style.color = "white";
+        closeTabsButton.style.backgroundColor = defaultcloseTabsButtonBackgroundColor;
+        titleInput.focus();
+      }
+
+      if (typeof preserveTabsByTitle !== "undefined") {
+        closeTabsButton.textContent = preserveTabsByTitle ? "Preserve Tabs" : "Close Tabs";
+      }
+    }
   }
 
   /**
