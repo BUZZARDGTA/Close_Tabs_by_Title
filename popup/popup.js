@@ -258,14 +258,12 @@ document.addEventListener("DOMContentLoaded", async function () {
       closeTabsButton.style.backgroundColor = "red";
       closeTabsButton.disabled = false;
       switchButton.disabled = false;
-      titleInput.focus();
     } else if (options.success) {
       resultMessage.textContent = options.success;
       resultMessage.style.color = "white";
       closeTabsButton.style.backgroundColor = "green";
       closeTabsButton.disabled = false;
       switchButton.disabled = false;
-      titleInput.focus();
     } else {
       let preserveTabsByTitle;
 
@@ -280,7 +278,6 @@ document.addEventListener("DOMContentLoaded", async function () {
         closeTabsButton.style.backgroundColor = defaultcloseTabsButtonBackgroundColor;
         closeTabsButton.disabled = false;
         switchButton.disabled = false;
-        titleInput.focus();
       }
 
       if (options.hasOwnProperty("switchButton")) {
@@ -288,12 +285,15 @@ document.addEventListener("DOMContentLoaded", async function () {
         resultMessage.textContent = "";
         resultMessage.style.color = "white";
         closeTabsButton.style.backgroundColor = defaultcloseTabsButtonBackgroundColor;
-        titleInput.focus();
       }
 
       if (typeof preserveTabsByTitle !== "undefined") {
         closeTabsButton.textContent = preserveTabsByTitle ? "Preserve Tabs" : "Close Tabs";
       }
+    }
+
+    if (typeof options.loading === "undefined") {
+      titleInput.focus();
     }
   }
 
