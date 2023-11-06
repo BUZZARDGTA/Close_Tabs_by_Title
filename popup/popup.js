@@ -17,11 +17,11 @@ document.addEventListener("DOMContentLoaded", async function () {
   titleInput.focus(); // Automatically focus on the title input field when the extension icon is clicked
 
   if ((await retrieveSettings("preserveTabsByTitle")).preserveTabsByTitle) {
-    closeTabsButton.textContent = "Preserve Tabs";
     switchButton.checked = true;
+    closeTabsButton.textContent = "Preserve Tabs";
   } else {
-    closeTabsButton.textContent = "Close Tabs";
     switchButton.checked = false;
+    closeTabsButton.textContent = "Close Tabs";
   }
 
   // Add a click event listener to the settings button
@@ -208,13 +208,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   }
 
   async function handleSwitchButton() {
-    if (switchButton.checked) {
-      await saveSettings({ preserveTabsByTitle: true });
-      closeTabsButton.textContent = "Preserve Tabs";
-    } else {
-      await saveSettings({ preserveTabsByTitle: false });
-      closeTabsButton.textContent = "Close Tabs";
-    }
+    await saveSettings({ preserveTabsByTitle: switchButton.checked });
     closeTabsButton.style.backgroundColor = defaultcloseTabsButtonBackgroundColor;
     resultMessage.textContent = "";
   }
