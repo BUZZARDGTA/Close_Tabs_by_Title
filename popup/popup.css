@@ -10,8 +10,14 @@ h1 {
 }
 
 p {
+  margin: 0;
   font-size: 18px;
   margin-top: 20px;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+p#errorsStream {
+  color: #ff0000;
 }
 
 #settingsButton {
@@ -91,7 +97,7 @@ button#closeTabsButton {
   width: 26px;
   left: 4px;
   bottom: 4px;
-  background-color: white;
+  background-color: #ffffff;
   -webkit-transition: 0.4s;
   transition: 0.4s;
 }

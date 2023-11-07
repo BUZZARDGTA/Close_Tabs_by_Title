@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   const openTabsCounter = document.getElementById("openTabsCounter");
   const tabsLoadingText = document.getElementById("tabsLoadingText");
   const resultMessage = document.getElementById("resultMessage");
+  const errorsStream = document.getElementById("errorsStream");
 
   const defaultSingleLineHeight = getComputedStyle(titleInput).height;
   const defaultcloseTabsButtonBackgroundColor = window.getComputedStyle(closeTabsButton).backgroundColor;
@@ -217,7 +218,21 @@ document.addEventListener("DOMContentLoaded", async function () {
    * @param {RegExp} regex
    */
   async function findTabsByTitleRegex(tabs, regex) {
-    return tabs.filter((tab) => regex.test(tab.title));
+    let prefix;
+
+    const filteredTabs = tabs.filter((tab) => {
+      try {
+        return regex.test(tab.title);
+      } catch (error) {
+        if (errorsStream.textContent !== undefined) {
+          prefix = "\n";
+        }
+        updateUI({ errorsStream: `${prefix}User-regex filtering error on tab's title: "${tab.title}"\n${error}` });
+      }
+    });
+
+    console.log(filteredTabs);
+    return filteredTabs;
   }
 
   /**
@@ -252,6 +267,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       resultMessage.textContent = "Loading...";
       resultMessage.style.color = "white";
       closeTabsButton.style.backgroundColor = defaultcloseTabsButtonBackgroundColor;
+      return;
     } else if (options.error) {
       resultMessage.textContent = options.error;
       resultMessage.style.color = "red";
@@ -264,6 +280,9 @@ document.addEventListener("DOMContentLoaded", async function () {
       closeTabsButton.style.backgroundColor = "green";
       closeTabsButton.disabled = false;
       switchButton.disabled = false;
+    } else if (options.errorsStream) {
+      errorsStream.textContent += options.errorsStream;
+      return;
     } else {
       let preserveTabsByTitle;
 
@@ -292,9 +311,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       }
     }
 
-    if (typeof options.loading === "undefined") {
-      titleInput.focus();
-    }
+    titleInput.focus();
   }
 
   /**
