@@ -91,12 +91,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       return;
     }
 
-    let regexFlags; // Declare the 'regexFlags' variable outside the if statement
-    if (settings.insensitiveSearch) {
-      regexFlags = "i";
-    } else {
-      regexFlags = undefined;
-    }
+    const regexFlags = settings.insensitiveSearch ? "i" : undefined;
 
     let regex;
     try {
