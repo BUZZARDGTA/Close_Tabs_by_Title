@@ -10,13 +10,18 @@ h1 {
 }
 
 p {
-  margin: 0;
-  font-size: 18px;
   margin-top: 20px;
+  margin-bottom: 0;
+  font-size: 18px;
+}
+p > span#tabsLoadingText {
   white-space: pre-wrap;
   overflow-wrap: break-word;
 }
 p#errorsStream {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
   color: #ff0000;
 }
 

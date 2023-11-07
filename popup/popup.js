@@ -213,15 +213,11 @@ document.addEventListener("DOMContentLoaded", async function () {
    * @param {RegExp} regex
    */
   async function findTabsByTitleRegex(tabs, regex) {
-    let prefix;
-
     const filteredTabs = tabs.filter((tab) => {
       try {
         return regex.test(tab.title);
       } catch (error) {
-        if (errorsStream.textContent !== undefined) {
-          prefix = "\n";
-        }
+        const prefix = errorsStream.textContent !== undefined ? "\n" : "";
         updateUI({ errorsStream: `${prefix}User-regex filtering error on tab's title: "${tab.title}"\n${error}` });
       }
     });
