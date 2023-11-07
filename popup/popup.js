@@ -231,7 +231,6 @@ document.addEventListener("DOMContentLoaded", async function () {
       }
     });
 
-    console.log(filteredTabs);
     return filteredTabs;
   }
 
