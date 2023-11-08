@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Close Tabs by Title",
-  "version": "1.9.2",
+  "version": "1.9.3",
   "description": "Close tabs with a specific title using regular expressions.",
   "developer": {
     "name": "IB_U_Z_Z_A_R_Dl",
