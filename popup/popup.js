@@ -1,6 +1,8 @@
 import { retrieveSettings } from "/js/retrieveSettings.js";
 import { saveSettings } from "/js/saveSettings.js";
 import { handleSettingChange } from "/js/handleSettingChange.js";
+import { openOrFocusHTMLPage } from "/js/openOrFocusHTMLPage.js";
+import { delay } from "/js/delay.js";
 
 document.addEventListener("DOMContentLoaded", async function () {
   const settingsButton = document.getElementById("settingsButton");
@@ -18,8 +20,8 @@ document.addEventListener("DOMContentLoaded", async function () {
   updateUI({ init: "popup" });
 
   // Add a click event listener to the settings button
-  settingsButton.addEventListener("click", function () {
-    browser.tabs.create({ url: "/settings/settings.html", active: true });
+  settingsButton.addEventListener("click", async function () {
+    await openOrFocusHTMLPage("/settings/settings.html");
     window.close();
   });
 
@@ -60,7 +62,9 @@ document.addEventListener("DOMContentLoaded", async function () {
   });
 
   switchButton.addEventListener("click", async () => {
-    await handleSwitchButton();
+    await saveSettings({ preserveTabsByTitle: switchButton.checked });
+    closeTabsButton.style.backgroundColor = defaultcloseTabsButtonBackgroundColor;
+    resultMessage.textContent = "";
   });
 
   browser.storage.onChanged.addListener((changes, areaName) => {
@@ -165,12 +169,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     return;
   }
 
-  async function handleSwitchButton() {
-    await saveSettings({ preserveTabsByTitle: switchButton.checked });
-    closeTabsButton.style.backgroundColor = defaultcloseTabsButtonBackgroundColor;
-    resultMessage.textContent = "";
-  }
-
   /**
    * This function filters an array of tabs to find those that are currently loading.
    * @param {Array} tabs
@@ -194,16 +192,6 @@ document.addEventListener("DOMContentLoaded", async function () {
   function filterFirefoxReservedTabs(tabs) {
     const reservedPrefixesRegex = new RegExp(/^(about|chrome|resource|moz-extension|data|view-source):/i);
     return tabs.filter((object) => !reservedPrefixesRegex.test(object.url));
-  }
-
-  /**
-   * This function creates a pause in code execution for a specified number of milliseconds.
-   * @param {number} milliseconds
-   */
-  function delay(milliseconds) {
-    return new Promise((resolve) => {
-      setTimeout(resolve, milliseconds);
-    });
   }
 
   /**
