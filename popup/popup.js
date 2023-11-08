@@ -63,8 +63,6 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   switchButton.addEventListener("click", async () => {
     await saveSettings({ preserveTabsByTitle: switchButton.checked });
-    closeTabsButton.style.backgroundColor = defaultcloseTabsButtonBackgroundColor;
-    resultMessage.textContent = "";
   });
 
   browser.storage.onChanged.addListener((changes, areaName) => {
@@ -241,10 +239,11 @@ document.addEventListener("DOMContentLoaded", async function () {
   async function updateUI(options) {
     if (options.loading) {
       closeTabsButton.disabled = true;
+      closeTabsButton.style.backgroundColor = defaultcloseTabsButtonBackgroundColor;
       switchButton.disabled = true;
       resultMessage.textContent = "Loading...";
       resultMessage.style.color = "white";
-      closeTabsButton.style.backgroundColor = defaultcloseTabsButtonBackgroundColor;
+      errorsStream.textContent = "";
       return;
     } else if (options.error) {
       resultMessage.textContent = options.error;
@@ -262,30 +261,31 @@ document.addEventListener("DOMContentLoaded", async function () {
       errorsStream.textContent += options.errorsStream;
       return;
     } else {
-      let preserveTabsByTitle;
-
-      if (options.init) {
-        if (options.init === "popup") {
-          preserveTabsByTitle = (await retrieveSettings("preserveTabsByTitle")).preserveTabsByTitle;
-          switchButton.checked = preserveTabsByTitle;
-        }
-
+      if (options.init || options.hasOwnProperty("switchButton")) {
         resultMessage.textContent = "";
         resultMessage.style.color = "white";
+        errorsStream.textContent = "";
         closeTabsButton.style.backgroundColor = defaultcloseTabsButtonBackgroundColor;
-        closeTabsButton.disabled = false;
-        switchButton.disabled = false;
+      }
+
+      let preserveTabsByTitle;
+
+      if (options.init === "popup") {
+        preserveTabsByTitle = (await retrieveSettings("preserveTabsByTitle")).preserveTabsByTitle;
+        switchButton.checked = preserveTabsByTitle;
       }
 
       if (options.hasOwnProperty("switchButton")) {
         preserveTabsByTitle = options.switchButton;
-        resultMessage.textContent = "";
-        resultMessage.style.color = "white";
-        closeTabsButton.style.backgroundColor = defaultcloseTabsButtonBackgroundColor;
       }
 
       if (typeof preserveTabsByTitle !== "undefined") {
         closeTabsButton.textContent = preserveTabsByTitle ? "Preserve Tabs" : "Close Tabs";
+      }
+
+      if (options.init === true) {
+        closeTabsButton.disabled = false;
+        switchButton.disabled = false;
       }
     }
 
