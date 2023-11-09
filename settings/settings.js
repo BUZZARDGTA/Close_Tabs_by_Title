@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", async function () {
    * @param {string} localStorageKey
    */
   function addCheckboxChangeListener(checkboxHtmlId, localStorageKey) {
-    checkboxHtmlId.addEventListener("change", async () => {
+    checkboxHtmlId.addEventListener("change", async function () {
       const settingsObj = { [localStorageKey]: checkboxHtmlId.checked }; // Create a settings object with a dynamic key based on localStorageKey and set its value to the checked state of the checkbox element
       await saveSettings(settingsObj); // Saving the settings based on checkbox changes
     });

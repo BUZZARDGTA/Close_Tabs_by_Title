@@ -57,11 +57,11 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
   });
 
-  closeTabsButton.addEventListener("click", async () => {
+  closeTabsButton.addEventListener("click", async function () {
     await closeOpenTabs();
   });
 
-  switchButton.addEventListener("click", async () => {
+  switchButton.addEventListener("click", async function () {
     await saveSettings({ preserveTabsByTitle: switchButton.checked });
   });
 
