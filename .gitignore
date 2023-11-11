@@ -1,4 +1,5 @@
 .devfolder/
 .prettierrc.json
+.prettierignore
 Close_Tabs_by_Title.zip
 compile.bat
